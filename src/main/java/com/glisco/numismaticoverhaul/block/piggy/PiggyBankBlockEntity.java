@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PiggyBankBlockEntity extends LootableContainerBlockEntity {
 
+    public boolean busy = false;
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3, ItemStack.EMPTY);
     @Nullable
     private final DyeColor color;
@@ -74,6 +75,7 @@ public class PiggyBankBlockEntity extends LootableContainerBlockEntity {
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        if (!this.checkUnlocked(player)) return null;
         return new PiggyBankScreenHandler(
                 syncId,
                 player.getInventory(),

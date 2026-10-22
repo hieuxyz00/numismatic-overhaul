@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
@@ -127,10 +128,14 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-
         if (!world.isClient) {
-            if (world.getBlockEntity(pos) instanceof NamedScreenHandlerFactory factory) {
-                player.openHandledScreen(factory);
+            if (world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) {
+                if (piggyBank.busy) return ActionResult.SUCCESS;
+
+                var syncId = player.openHandledScreen(piggyBank);
+                if (syncId.isPresent()) {
+                    piggyBank.busy = true;
+                }
             }
         }
 
@@ -142,6 +147,8 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
         if (entity instanceof FallingBlockEntity fallingBlock && fallingBlock.getBlockState().isIn(NumismaticOverhaul.VERY_HEAVY_BLOCKS) && !world.isClient) {
             if (world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) {
                 ItemScatterer.spawn(world, pos.offset(world.getBlockState(pos).get(FACING).getOpposite()), piggyBank.inventory());
+                piggyBank.inventory().clear();
+                piggyBank.busy = false;
             }
 
             world.removeBlock(pos, false);
@@ -182,8 +189,10 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
                 NumismaticOverhaul.PIGGY_BANK_BROKEN.spawn(piggyBank.getWorld(), Vec3d.of(piggyBank.getPos()), 5);
 
                 var drops = new ArrayList<>(super.getDroppedStacks(state, builder));
-                piggyBank.inventory().stream().filter(stack -> !stack.isEmpty()).forEach(drops::add);
-                drops.removeIf(itemStack -> itemStack.getItem().equals(NumismaticOverhaulBlocks.PIGGY_BANK.asItem()));
+                piggyBank.inventory().stream().filter(stack -> !stack.isEmpty()).map(ItemStack::copy).forEach(drops::add);
+                drops.removeIf(itemStack -> itemStack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof PiggyBankBlock);
+                piggyBank.inventory().clear();
+                piggyBank.busy = false;
                 return drops;
             } else {
                 builder.addDynamicDrop(Identifier.of("contents"), (consumer) -> {
