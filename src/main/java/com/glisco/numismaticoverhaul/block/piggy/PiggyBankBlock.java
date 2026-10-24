@@ -129,13 +129,8 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
-            if (world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) {
-                if (piggyBank.busy) return ActionResult.SUCCESS;
-
-                var syncId = player.openHandledScreen(piggyBank);
-                if (syncId.isPresent()) {
-                    piggyBank.busy = true;
-                }
+            if (world.getBlockEntity(pos) instanceof NamedScreenHandlerFactory factory) {
+                player.openHandledScreen(factory);
             }
         }
 
@@ -148,7 +143,6 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
             if (world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) {
                 ItemScatterer.spawn(world, pos.offset(world.getBlockState(pos).get(FACING).getOpposite()), piggyBank.inventory());
                 piggyBank.inventory().clear();
-                piggyBank.busy = false;
             }
 
             world.removeBlock(pos, false);
@@ -192,7 +186,6 @@ public class PiggyBankBlock extends HorizontalFacingBlock implements BlockEntity
                 piggyBank.inventory().stream().filter(stack -> !stack.isEmpty()).map(ItemStack::copy).forEach(drops::add);
                 drops.removeIf(itemStack -> itemStack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof PiggyBankBlock);
                 piggyBank.inventory().clear();
-                piggyBank.busy = false;
                 return drops;
             } else {
                 builder.addDynamicDrop(Identifier.of("contents"), (consumer) -> {

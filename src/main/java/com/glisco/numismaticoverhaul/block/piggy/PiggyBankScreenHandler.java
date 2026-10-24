@@ -39,23 +39,11 @@ public class PiggyBankScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
-        this.context.run((world, pos) -> {
-            if (world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) {
-                piggyBank.busy = false;
-            }
-        });
-    }
-
-    @Override
     public boolean canUse(PlayerEntity player) {
         return context.get(
-            (world, pos) -> {
-                if (!world.getBlockState(pos).isIn(NumismaticOverhaul.PIGGY_BANKS)) return false;
-                if (!(world.getBlockEntity(pos) instanceof PiggyBankBlockEntity piggyBank) || piggyBank.isRemoved()) return false;
-                return player.squaredDistanceTo((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64.0;
-            },
+            (world, pos) -> !world.getBlockState(pos).isIn(NumismaticOverhaul.PIGGY_BANKS)
+                ? false
+                : player.squaredDistanceTo((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5) <= 64.0,
             true
         );
     }
