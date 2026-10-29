@@ -2,7 +2,7 @@ package com.glisco.numismaticoverhaul;
 
 import com.glisco.numismaticoverhaul.block.NumismaticOverhaulBlocks;
 import com.glisco.numismaticoverhaul.block.pawn.PawnShopScreenHandler;
-import com.glisco.numismaticoverhaul.block.piggy.PiggyBankScreenHandler;
+import com.glisco.numismaticoverhaul.block.PiggyBankScreenHandler;
 import com.glisco.numismaticoverhaul.block.pawn.PawnShopOffer;
 import com.glisco.numismaticoverhaul.block.shop.ShopOffer;
 import com.glisco.numismaticoverhaul.block.shop.ShopScreenHandler;

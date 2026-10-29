@@ -1,6 +1,7 @@
 package com.glisco.numismaticoverhaul.block.piggy;
 
 import com.glisco.numismaticoverhaul.block.NumismaticOverhaulBlocks;
+import com.glisco.numismaticoverhaul.block.PiggyBankScreenHandler;
 import io.wispforest.owo.util.ImplementedInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
